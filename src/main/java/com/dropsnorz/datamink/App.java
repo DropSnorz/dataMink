@@ -2,6 +2,7 @@ package com.dropsnorz.datamink;
 
 import java.io.IOException;
 
+import org.apache.log4j.BasicConfigurator;
 import org.springframework.shell.Bootstrap;
 
 import fr.univlyon1.mif37.dex.mapping.Mapping;
@@ -15,7 +16,8 @@ public class App
 {
     public static void main( String[] args ) throws ParseException
     {
-        System.out.println( "Hello World!" );
+    	
+    	//BasicConfigurator.configure();
         
         try {
 			Bootstrap.main(args);
