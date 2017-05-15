@@ -43,6 +43,6 @@ public class BannerProvider extends DefaultBannerProvider  {
 	
 	@Override
 	public String getProviderName() {
-		return "DataMink banner";
+		return "DataMink provider";
 	}
 }
