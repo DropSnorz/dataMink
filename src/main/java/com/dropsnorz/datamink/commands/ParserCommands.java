@@ -30,21 +30,9 @@ public class ParserCommands implements CommandMarker {
 	public String parse(
 			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
 
-		FileInputStream fis;
 
 		try {
-			if(path != null){
-				fis = new FileInputStream(path);
-			}
-			else{
-				if(fileService.isCurrentFileLoaded()){
-					fis = new FileInputStream(fileService.getCurrentFilePath());
-				}
-				else{
-					return "Error: No file loaded";
-				}
-			}
-
+			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
@@ -60,37 +48,21 @@ public class ParserCommands implements CommandMarker {
 
 		return null;
 
-
 	}
 	
 	
-	
-	
-	@CliCommand(value = "dm prgm-type", help = "Print a simple hello world message")
+	@CliCommand(value = "dm prgm-type", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
 	public String prgmType(
 			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
 
-		FileInputStream fis;
-
 		try {
-			if(path != null){
-				fis = new FileInputStream(path);
-			}
-			else{
-				if(fileService.isCurrentFileLoaded()){
-					fis = new FileInputStream(fileService.getCurrentFilePath());
-				}
-				else{
-					return "Error: No file loaded";
-				}
-			}
+			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
 
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
-				
-				EvaluationEngine engine = new EvaluationEngine();
-				ProgramType type = engine.computeProgramType(mapping);
+				EvaluationEngine engine = new EvaluationEngine(mapping);
+				ProgramType type = engine.computeProgramType();
 				
 				return "Program is " + type;
 				
@@ -105,6 +77,44 @@ public class ParserCommands implements CommandMarker {
 
 		return null;
 
+	}
+	
+	
+	@CliCommand(value = "dm stratify", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
+	public String stratify(
+			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
+
+		try {
+			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
+
+			MappingParser mp = new MappingParser(fis);
+			try {
+				Mapping mapping = mp.mapping();
+				EvaluationEngine engine = new EvaluationEngine(mapping);
+				ProgramType type = engine.computeProgramType();
+
+				
+				if(type == ProgramType.POSITIVE){
+					return "Program is Positive, no need to stratify it";
+				}
+				else if(type == ProgramType.SEMI_POSITIVE){
+					return engine.stratify().toString();
+				}
+				else{
+					return "Program is not Stratifiable";
+
+				}
+				
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} catch (FileNotFoundException e) {
+			return "File not found !";
+		}
+
+		return null;
 
 	}
 
