@@ -12,6 +12,7 @@ import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
 import com.dropsnorz.datamink.core.EvaluationEngine;
+import com.dropsnorz.datamink.core.ProgramEvaluator;
 import com.dropsnorz.datamink.core.ProgramType;
 import com.dropsnorz.datamink.service.FileService;
 import com.dropsnorz.datamink.utils.MappingStringUtils;
@@ -104,6 +105,40 @@ public class ParserCommands implements CommandMarker {
 					return "Program is not Stratifiable";
 
 				}
+				
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} catch (FileNotFoundException e) {
+			return "File not found !";
+		}
+
+		return null;
+
+	}
+	
+	
+	
+	@CliCommand(value = "dm eval", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
+	public String eval(
+			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
+
+		try {
+			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
+
+			MappingParser mp = new MappingParser(fis);
+			try {
+				Mapping mapping = mp.mapping();
+				EvaluationEngine engine = new EvaluationEngine(mapping);
+				ProgramType type = engine.computeProgramType();
+				
+				ProgramEvaluator evaluator = new ProgramEvaluator(mapping);
+				evaluator.evaluation();
+				
+				return evaluator.getComputedFactsDisplay();
+
 				
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
