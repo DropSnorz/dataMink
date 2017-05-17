@@ -8,3 +8,6 @@
 out
 .sonar
 sonar-project.properties
+*.log
+
+

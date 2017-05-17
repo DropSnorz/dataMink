@@ -118,12 +118,6 @@ public class EvaluationEngine {
 				}
 			}
 		}
-
-		String output = "Stratification: \n";
-		for(String s : stratum.keySet()){
-			output += s + " | " + stratum.get(s) + " \n";
-		}
-		System.out.println(output);
 		
 		
 		StratifiedDatalogProgram sProgram = new StratifiedDatalogProgram();
@@ -195,8 +189,6 @@ public class EvaluationEngine {
 				g.addEdge(exprName, t.getRight().getName(), edge);
 
 			}
-
-
 		}
 
 		return g;
