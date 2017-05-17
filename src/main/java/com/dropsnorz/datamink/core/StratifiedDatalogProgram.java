@@ -59,6 +59,9 @@ public class StratifiedDatalogProgram {
 
 	}
 
+	public ArrayList<ArrayList<Object>> getPartitions() {
+		return partitions;
+	}
 
 
 

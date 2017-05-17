@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.dropsnorz.datamink.core.EvaluationEngine;
 import com.dropsnorz.datamink.core.ProgramEvaluator;
 import com.dropsnorz.datamink.core.ProgramType;
+import com.dropsnorz.datamink.core.StratifiedDatalogProgram;
 import com.dropsnorz.datamink.service.FileService;
 import com.dropsnorz.datamink.utils.MappingStringUtils;
 
@@ -132,10 +133,20 @@ public class ParserCommands implements CommandMarker {
 			try {
 				Mapping mapping = mp.mapping();
 				EvaluationEngine engine = new EvaluationEngine(mapping);
-				ProgramType type = engine.computeProgramType();
 				
+				ProgramType type = engine.computeProgramType();
 				ProgramEvaluator evaluator = new ProgramEvaluator(mapping);
-				evaluator.evaluation();
+
+				if(type == ProgramType.POSITIVE){
+					evaluator.evaluation();
+				}
+				else if (type == ProgramType.SEMI_POSITIVE){
+					StratifiedDatalogProgram stratification = engine.stratify();
+					evaluator.stratifiedEvaluation(stratification);
+				}
+				else{
+					return "Error: could not compute program type";
+				}
 				
 				return evaluator.getComputedFactsDisplay();
 
