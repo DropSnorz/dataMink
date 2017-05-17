@@ -57,7 +57,7 @@ public class ProgramEvaluator {
 		
 		//DEBUG
 		
-		String output = "";
+		String output = "---Base Facts--- \n";
 		for(String key : baseFacts.keySet()){
 			for(String[] list : baseFacts.get(key)){
 				output += key + "(" + StringUtils.arrayToCommaDelimitedString(list) +")\n";
@@ -73,9 +73,7 @@ public class ProgramEvaluator {
 		while(loop){
 			loop = false;
 			for(Tgd t : mapping.getTgds()){
-				
-				int nArgs = t.getRight().getArgs().length;
-				
+								
 				ArrayList<String> varList = new ArrayList<String>();
 				
 				for(Literal l : t.getLeft()){
@@ -99,19 +97,14 @@ public class ProgramEvaluator {
 					i++;
 				}
 				
-				
 				String[][] groundings = getAllLists(map,nVars);
 				
 				for(String[] set: groundings){
 					
-					System.out.println(StringUtils.arrayToCommaDelimitedString(set));
-					
+					//System.out.println(StringUtils.arrayToCommaDelimitedString(set));
 					if (evalTgdInstance(t, set, varArray)){
-						//All body clauses are positive, we can add a new fact
 						
-						System.out.println("==> Computed a fact !");
-						
-						
+						//All body clauses are positive, we check to add a fact					
 						if(addOrRejectComputedFact(t, set, varArray)){
 							loop = true;
 						}
@@ -119,12 +112,8 @@ public class ProgramEvaluator {
 					}
 				}
 				
-				
-				
 			}
 		}
-		
-		
 		
 	}
 	
@@ -185,7 +174,7 @@ public class ProgramEvaluator {
 	public boolean evalLiteralInstance(Literal l, String[] map, String[] vars){
 		
 		ArrayList<String[]> baseFactsInstanceList = baseFacts.get(l.getAtom().getName());
-		ArrayList<String[]> computedFactsInstanceList = baseFacts.get(l.getAtom().getName());
+		ArrayList<String[]> computedFactsInstanceList = computedFacts.get(l.getAtom().getName());
 		
 		String[] currentVars = new String[l.getAtom().getVars().size()];
 		
@@ -230,6 +219,7 @@ public class ProgramEvaluator {
 				return map[i];
 			}
 		}
+		System.out.println("Error ! looking for " + arg);
 		return null;
 	}
 	
