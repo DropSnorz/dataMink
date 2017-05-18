@@ -21,44 +21,73 @@ public class EvaluationEngine {
 	Mapping mapping;
 
 	public EvaluationEngine(Mapping mapping){
- 
+
 		this.mapping = mapping;
 
 	}
 
 	public ProgramType computeProgramType(){
 
+
+		if(isPositive()) return ProgramType.POSITIVE;
+		if(isSemiPositive()) return ProgramType.SEMI_POSITIVE;
+
+
 		//Check for positive datalog program
-		boolean positive = true;
 		boolean stratifiable = true;
 
+		DirectedGraph<String, SignedEdge> graph = generateMappingGraph();
+
+		CycleDetector<String, SignedEdge> cycleDetector = new CycleDetector<String, SignedEdge>(graph);
+		Set<String> nodesInCycle = cycleDetector.findCycles();
+
+
+		for(String node : nodesInCycle){
+			for(String checkNode : nodesInCycle){
+				if(checkNode.equals(node)){
+
+					if(graph.containsEdge(node, checkNode)){
+						SignedEdge edge = graph.getEdge(node, checkNode);
+
+						if(!edge.getSign()){
+							stratifiable = false;
+						}
+					}
+				}
+			}
+		}
+
+		if(stratifiable){
+			return ProgramType.STRATIFIED;
+
+		}
+		else{
+			return ProgramType.UNKNOW;
+		}
+	}
+
+	private boolean isPositive(){
 		for(Tgd t : mapping.getTgds()){
 			for(Literal l : t.getLeft()){
 				if(!l.getFlag()){
-					positive = false;
+					return false;
 				}
 			}
 
 		}
 
-		if(! positive){
+		return true;
+	}
 
-			DirectedGraph<String, SignedEdge> graph = generateMappingGraph();
-
-			CycleDetector<String, SignedEdge> cycleDetector = new CycleDetector<String, SignedEdge>(graph);
-			Set<String> nodesInCycle = cycleDetector.findCycles();
-
-
-			for(String node : nodesInCycle){
-				for(String checkNode : nodesInCycle){
-					if(checkNode.equals(node)){
-
-						if(graph.containsEdge(node, checkNode)){
-							SignedEdge edge = graph.getEdge(node, checkNode);
-
-							if(!edge.getSign()){
-								stratifiable = false;
-							}
+	private boolean isSemiPositive(){
+		boolean semiPositive = false;
+		for(Tgd t : mapping.getTgds()){
+			for(Literal l : t.getLeft()){
+				if(!l.getFlag()){
+					semiPositive = false;
+					for(Relation r : mapping.getEDB()){
+						if(r.getName().equals(l.getAtom().getName())){
+							semiPositive = true;
 						}
 					}
 				}
@@ -66,16 +95,7 @@ public class EvaluationEngine {
 
 		}
 
-		if(positive){
-			return ProgramType.POSITIVE;
-
-		}
-		else if (stratifiable){
-			return ProgramType.SEMI_POSITIVE;
-		}
-		else{
-			return ProgramType.UNKNOW;
-		}
+		return semiPositive;
 	}
 
 	public StratifiedDatalogProgram stratify(){
@@ -118,24 +138,24 @@ public class EvaluationEngine {
 				}
 			}
 		}
-		
-		
+
+
 		StratifiedDatalogProgram sProgram = new StratifiedDatalogProgram();
-		
+
 		for(Relation r : mapping.getEDB()){
 			sProgram.add(stratum.get(r.getName()), r);
 		}
-		
+
 		for(AbstractRelation r: mapping.getIDB()){
 			sProgram.add(stratum.get(r.getName()), r);
 		}
-		
+
 		for(Tgd t : mapping.getTgds()){
 			sProgram.add(stratum.get(t.getRight().getName()), t);
 		}
-		
-		
-		
+
+
+
 		return sProgram;
 
 	}

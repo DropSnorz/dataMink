@@ -99,7 +99,7 @@ public class ParserCommands implements CommandMarker {
 				if(type == ProgramType.POSITIVE){
 					return "Program is Positive, no need to stratify it";
 				}
-				else if(type == ProgramType.SEMI_POSITIVE){
+				else if(type == ProgramType.SEMI_POSITIVE || type == ProgramType.STRATIFIED){
 					return engine.stratify().toString();
 				}
 				else{
@@ -140,7 +140,7 @@ public class ParserCommands implements CommandMarker {
 				if(type == ProgramType.POSITIVE){
 					evaluator.evaluation();
 				}
-				else if (type == ProgramType.SEMI_POSITIVE){
+				else if (type == ProgramType.SEMI_POSITIVE || type == ProgramType.STRATIFIED){
 					StratifiedDatalogProgram stratification = engine.stratify();
 					evaluator.stratifiedEvaluation(stratification);
 				}
