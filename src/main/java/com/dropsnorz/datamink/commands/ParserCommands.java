@@ -30,11 +30,19 @@ public class ParserCommands implements CommandMarker {
 
 	@CliCommand(value = "dm parse", help = "Parse the given datalog program and show results")
 	public String parse(
-			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
+			@CliOption(key = { "" }, mandatory = false, help = "Datalog file to parse") final String defaultPath,
+			@CliOption(key = { "file" }, mandatory = false, help = "Datalog file to parse") final String path){
 
 
 		try {
-			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
+			FileInputStream fis;
+
+			if(defaultPath != null){
+				fis = fileService.getStreamFromPathOrLocal(defaultPath);
+			}
+			else{
+				fis = fileService.getStreamFromPathOrLocal(path);
+			}
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
@@ -51,23 +59,31 @@ public class ParserCommands implements CommandMarker {
 		return null;
 
 	}
-	
-	
-	@CliCommand(value = "dm prgm-type", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
+
+
+	@CliCommand(value = "dm prgm-type", help = "Returns datalog program type (Positive, Semo-positive, Stratified, Unknow)")
 	public String prgmType(
-			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
+			@CliOption(key = { "" }, mandatory = false, help = "Datalog file to analyse") final String defaultPath,
+			@CliOption(key = { "file" }, mandatory = false, help = "Datalog file to analyse") final String path){
 
 		try {
-			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
+			FileInputStream fis;
+
+			if(defaultPath != null){
+				fis = fileService.getStreamFromPathOrLocal(defaultPath);
+			}
+			else{
+				fis = fileService.getStreamFromPathOrLocal(path);
+			}
 
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
 				EvaluationEngine engine = new EvaluationEngine(mapping);
 				ProgramType type = engine.computeProgramType();
-				
+
 				return "Program is " + type;
-				
+
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -80,14 +96,23 @@ public class ParserCommands implements CommandMarker {
 		return null;
 
 	}
-	
-	
+
+
 	@CliCommand(value = "dm stratify", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
 	public String stratify(
-			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
+			@CliOption(key = { "" }, mandatory = false, help = "Datalog program file to stratify") final String defaultPath,
+			@CliOption(key = { "file" }, mandatory = false, help = "Datalog program file to stratify") final String path){
 
 		try {
-			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
+			FileInputStream fis;
+
+			if(defaultPath != null){
+				fis = fileService.getStreamFromPathOrLocal(defaultPath);
+			}
+			else{
+				fis = fileService.getStreamFromPathOrLocal(path);
+			}
+
 
 			MappingParser mp = new MappingParser(fis);
 			try {
@@ -95,7 +120,7 @@ public class ParserCommands implements CommandMarker {
 				EvaluationEngine engine = new EvaluationEngine(mapping);
 				ProgramType type = engine.computeProgramType();
 
-				
+
 				if(type == ProgramType.POSITIVE){
 					return "Program is Positive, no need to stratify it";
 				}
@@ -106,7 +131,7 @@ public class ParserCommands implements CommandMarker {
 					return "Program is not Stratifiable";
 
 				}
-				
+
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -119,21 +144,29 @@ public class ParserCommands implements CommandMarker {
 		return null;
 
 	}
-	
-	
-	
+
+
+
 	@CliCommand(value = "dm eval", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
 	public String eval(
-			@CliOption(key = { "file" }, mandatory = false, help = "The hello world message") final String path){
+			@CliOption(key = { "" }, mandatory = false, help = "Datalog program file to evaluate") final String defaultPath,
+			@CliOption(key = { "file" }, mandatory = false, help = "Datalog program file to evaluate") final String path){
 
 		try {
-			FileInputStream fis = fileService.getStreamFromPathOrLocal(path);
+			FileInputStream fis;
+
+			if(defaultPath != null){
+				fis = fileService.getStreamFromPathOrLocal(defaultPath);
+			}
+			else{
+				fis = fileService.getStreamFromPathOrLocal(path);
+			}
 
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
 				EvaluationEngine engine = new EvaluationEngine(mapping);
-				
+
 				ProgramType type = engine.computeProgramType();
 				ProgramEvaluator evaluator = new ProgramEvaluator(mapping);
 
@@ -147,10 +180,10 @@ public class ParserCommands implements CommandMarker {
 				else{
 					return "Error: could not compute program type";
 				}
-				
+
 				return evaluator.getComputedFactsDisplay();
 
-				
+
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

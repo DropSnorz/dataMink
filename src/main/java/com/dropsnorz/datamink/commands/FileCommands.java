@@ -16,12 +16,19 @@ public class FileCommands implements CommandMarker {
 	
 	@CliCommand(value = "dm load", help = "Load Datalog file")
 	public String simple(
-		@CliOption(key = { "file" }, mandatory = true, help = "File to load in DataMink") final String path){
+			@CliOption(key = { "" }, mandatory = true, help = "File to load in DataMink") final String defaultPath,
+			@CliOption(key = { "file" }, mandatory = true, help = "File to load in DataMink") final String path){
 		
-		if(fileService.loadFile(path)){
+		
+		if(defaultPath != null && fileService.loadFile(defaultPath)){
 			return "File successfuly loaded: " + fileService.getCurrentFilePath();
 
 		}
+		else if (path != null && fileService.loadFile(path)){
+			return "File successfuly loaded: " + fileService.getCurrentFilePath();
+
+		}
+		
 		else{
 			return "Invalid file path";
 		}
