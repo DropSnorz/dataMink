@@ -58,7 +58,7 @@ public class EvaluationEngine {
 		}
 
 		if(stratifiable){
-			return ProgramType.STRATIFIED;
+			return ProgramType.STRATIFIABLE;
 
 		}
 		else{

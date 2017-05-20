@@ -1,0 +1,26 @@
+EDB
+f(Un,Deux)
+f(Deux,Trois)
+f(Trois,Un)
+c(Un,Deux)
+c(Un,R)
+c(Deux,B)
+c(Trois,J)
+
+IDB
+s($x)
+r($x,$y)
+p($x,$y)
+a($x)
+
+MAPPING
+p($x,$x), NEG r($x,$x) -> s($x).
+p($x,$y), c($x, $y) -> r($x,$y).
+p($x,$y), c($y, $x) -> r($x,$y).
+f($x,$y) -> p($x,$y).
+p($x,$y), f($y,$z) -> p($x,$z).
+p($x,$x), NEG s($x) -> a($x).
+
+
+
+

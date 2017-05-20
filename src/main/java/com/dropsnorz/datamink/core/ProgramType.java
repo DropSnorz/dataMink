@@ -2,7 +2,7 @@ package com.dropsnorz.datamink.core;
 
 public enum ProgramType {
 	POSITIVE ("Positive"),
-	STRATIFIED ("Stratified"),
+	STRATIFIABLE ("Stratifiable"),
 	SEMI_POSITIVE ("Semi-Positive"),
 	UNKNOW ("Unknow");
 	
