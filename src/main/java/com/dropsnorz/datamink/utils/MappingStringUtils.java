@@ -9,6 +9,7 @@ import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
 import fr.univlyon1.mif37.dex.mapping.Relation;
 import fr.univlyon1.mif37.dex.mapping.Tgd;
+import fr.univlyon1.mif37.dex.mapping.Value;
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
 public class MappingStringUtils {
@@ -48,11 +49,18 @@ public class MappingStringUtils {
 	
 	public static String generateTgdString(Tgd t){
 		String output = "";
+		int i = 0;
 		for(Literal l : t.getLeft() ){
-			output += generateLiteralString(l) + ", ";
+			output += generateLiteralString(l);
+			if(i < t.getLeft().size() - 1){
+				output += ",";
+			}
+			i++;
 		}
 		
-		output += " -> " + t.getRight().getName();
+		output += " -> " + generateAtomString(t.getRight());
+		
+		
 		
 		return output;
 	}
@@ -75,8 +83,20 @@ public class MappingStringUtils {
 	
 	public static String generateAtomString(Atom a){
 		String output = "";
-		
 		output += a.getName();		
+		output +="(";
+				
+		int i = 0;
+		for(Variable v : a.getVars()){
+			output += v.getName();
+			
+			if(i < a.getVars().size() - 1){
+				output +=",";
+			}
+			i++;
+		}
+		
+		output += ")";
 		
 		return output;
 		
