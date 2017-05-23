@@ -8,6 +8,8 @@ import java.util.Set;
 import org.springframework.util.StringUtils;
 
 import com.dropsnorz.datamink.core.sql.SQLBuilder;
+import com.dropsnorz.datamink.core.sql.SQLTableBuilder;
+import com.dropsnorz.datamink.core.sql.SQLViewBuilder;
 import com.dropsnorz.datamink.core.sql.TableEntity;
 import com.dropsnorz.datamink.utils.MappingStringUtils;
 
@@ -31,7 +33,7 @@ public class SQLTranslator {
 		for(Tgd t : mapping.getTgds()){
 
 			if(isRecursive(t)){
-				queries += generateComments("Recursive datalog rule not translated: "
+				queries += new SQLBuilder().comments("Recursive datalog rule not translated: "
 						+ MappingStringUtils.generateTgdString(t));
 			}
 			else{
@@ -49,21 +51,22 @@ public class SQLTranslator {
 		for(Relation r: mapping.getEDB()){
 
 			tables.put(r.getName(), r.getAttributes().length);
+			
+			queries += new SQLBuilder().insertInto(r.getName()).values(r.getAttributes()).build() + "\n";
 
-			queries += ("INSERT INTO " + r.getName() + " VALUES (" + StringUtils.arrayToCommaDelimitedString(r.getAttributes()) + "); \n");
 		}
 
 		for(String table : tables.keySet()){
 
 			int nColumns = tables.get(table);
-			String[] columns = new String[nColumns];
+			
+			SQLTableBuilder builder = new SQLBuilder().createTable(table);
 
 			for(int i = 0; i < nColumns; i++){
-				columns[i] = table + Integer.toString(i) + " VARCHAR(150)";
+				builder.appendColumns(Integer.toString(i), "VARCHAR(150)");
 			}
-			String tableQuery = "CREATE TABLE "+ table + "( " + StringUtils.arrayToCommaDelimitedString(columns) + " )";
 
-			queries = tableQuery + "\n" + queries;
+			queries = builder.build() + "\n" + queries;
 		}
 
 		return queries;
@@ -75,13 +78,9 @@ public class SQLTranslator {
 		for(Variable v : t.getRight().getVars()){
 			fields.add(v.getName());
 		}
-		String query = new SQLBuilder(t.getRight().getName()).asSelect(fields).bindLiterals(t.getLeft()).build();
+		String query = new SQLBuilder().createView(t.getRight().getName()).asSelect(fields).bindLiterals(t.getLeft()).build();
 		
 		return query;
-	}
-	private String generateComments(String text){
-
-		return "/* " + text + " */ \n";
 	}
 
 	private boolean isRecursive(Tgd t){
