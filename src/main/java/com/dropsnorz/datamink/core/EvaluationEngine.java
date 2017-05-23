@@ -107,34 +107,19 @@ public class EvaluationEngine {
 			stratum.put(p, 0);
 		}
 
-		for(String p : predicates){
 
-			boolean changes = true;
+		for(Tgd t : mapping.getTgds()){
+			String p = t.getRight().getName();
 
-			while(changes){
+			for(Literal l : t.getLeft()){
+				if(!l.getFlag()){
+					int strat = Math.max(stratum.get(p), stratum.get(l.getAtom().getName()) + 1);
+					stratum.put(p, strat);
+				}
+				else{
+					int strat = Math.max(stratum.get(p), stratum.get(l.getAtom().getName()));
+					stratum.put(p, strat);
 
-				changes = false;
-
-				for(Tgd t : mapping.getTgds()){
-					if(t.getRight().getName().equals(p)){
-
-						for(Literal l : t.getLeft()){
-							if(!l.getFlag()){
-								int strat = Math.max(stratum.get(p), stratum.get(l.getAtom().getName()) + 1);
-								if(!(stratum.get(p) == strat)){	
-									changes = true;
-									stratum.put(p, strat);
-								}
-							}
-							else{
-								int strat = Math.max(stratum.get(p), stratum.get(l.getAtom().getName()));
-								if(!(stratum.get(p) == strat)){	
-									changes = true;
-									stratum.put(p, strat);
-								}
-							}
-						}
-					}
 				}
 			}
 		}
