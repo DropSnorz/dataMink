@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.springframework.util.StringUtils;
+
 import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
 public class SQLViewBuilder {
 
-	String viewName;
-	ArrayList<String> selectFields;
+	protected String viewName;
+	protected ArrayList<String> selectFields;
 
-	HashMap<Literal, TableEntity> tables = new HashMap<Literal, TableEntity>();
-	ArrayList<TableReference> references = new ArrayList<TableReference>();
+	protected HashMap<Literal, TableEntity> tables = new HashMap<Literal, TableEntity>();
+	protected ArrayList<TableReference> references = new ArrayList<TableReference>();
+
+	protected ArrayList<Literal> negatedLiterals;
 
 
 	public SQLViewBuilder(String viewName){
@@ -21,21 +25,26 @@ public class SQLViewBuilder {
 		this.viewName = viewName;
 		this.selectFields = new ArrayList<String>();
 	}
-	
+
 	public SQLViewBuilder asSelect(ArrayList<String> fields){
-		
+
 		this.selectFields = fields;
-		
+
 		return this;
 	}
 
 	public SQLViewBuilder bindLiterals(Collection<Literal> literals){
+
 		tables = new HashMap<Literal, TableEntity>();
-		
+		negatedLiterals = new ArrayList<Literal>();
+
 		HashMap<String, Integer> tablePrefix = new HashMap<String, Integer>();
 
 		for(Literal l : literals){
 
+			if(!l.getFlag()){
+				negatedLiterals.add(l);
+			}
 			String prefix = "";
 
 			if(!tablePrefix.containsKey(l.getAtom().getName())){
@@ -55,20 +64,20 @@ public class SQLViewBuilder {
 				variables.add(v.getName());
 			}
 			table.setColumnsMap(variables);
-			
+
 			ArrayList<String> columns = new ArrayList<String>();
- 			for(int k = 0; k < variables.size(); k ++){
+			for(int k = 0; k < variables.size(); k ++){
 				columns.add(Integer.toString(k + 1));
 			}
 			table.setColumns(columns);
-			
+
 			tables.put(l, table);
 		}
-		
+
 		for(TableEntity table : tables.values()){
 			System.out.println(table);
 		}
-		
+
 
 		if(tables.values().size() > 1){
 			for(TableEntity table : tables.values()){
@@ -112,22 +121,20 @@ public class SQLViewBuilder {
 		for(String selectField : selectFields){
 			boolean selected = false;
 			for(TableEntity table : tables.values()){
-				
+
 				if(!selected && table.getColumnsMap().contains(selectField)){
-					
+
 					query += table.getPrefix() + "." + table.getColumnNameByColumnMap(selectField);
 					selected = true;
 				}	
 			}
-			
+
 			if(i < selectFields.size()- 1){
 				query += ", ";
 			}
-			
+
 			i++;
 		}
-		
-		//DO SELECT STUFF
 
 		query += " FROM ";
 
@@ -148,27 +155,102 @@ public class SQLViewBuilder {
 
 			String whereQuery = " WHERE ";
 
-			i=0;
-			for(TableReference relation : references){
-				whereQuery += relation.getInReference().getPrefix() + "." 
-						+ relation.getInColumn() + " = "
-						+ relation.getOutReference().getPrefix() + "." + relation.getOutColumn();
-				if(i < references.size() - 1){
-					whereQuery += " AND ";
+			if(negatedLiterals.size() == 0){
+
+				i=0;
+				for(TableReference relation : references){
+					whereQuery += relation.getInReference().getPrefix() + "." 
+							+ relation.getInColumn() + " = "
+							+ relation.getOutReference().getPrefix() + "." + relation.getOutColumn();
+					if(i < references.size() - 1){
+						whereQuery += " AND ";
+					}
+
+					i++;
+
 				}
-				
-				i++;
-				
 			}
 			
-			query += whereQuery;
+			//Generate clauses with negated literals
+			else{
+				
+				ArrayList<String>  subWhereClauses = new ArrayList<String>();
+				
+				for(Literal l : negatedLiterals){
+					String literalName = l.getAtom().getName();
+					for(TableReference reference : references){
+						
+						String subWhereClause = "(";
+						
+						subWhereClause += generateRelationString(reference, "<>");
+						
+						if(reference.getInReference().getName().equals(literalName)
+								||reference.getOutReference().getName().equals(literalName)){
+							
+							for(TableReference printReference : references){
+								
+								if(!printReference.equals(reference)){
+									subWhereClause += " AND " + generateRelationString(printReference, "=");
+									//String assume ==
+								}
+							}
+						}
+						
+						subWhereClause += ")";
+						
+						subWhereClauses.add(subWhereClause);
+						
+					}
+				}
+				
+				
+				whereQuery = StringUtils.collectionToDelimitedString(subWhereClauses, " OR ");
+				
+				ArrayList<String> positiveClauses = new ArrayList<String>();
+				
+				for(TableReference reference : references){
+					
+					boolean addReference = true;
+					
+					for(Literal l : negatedLiterals){
+						
+						if(reference.getInReference().getName().equals(l.getAtom().getName())
+								|| reference.getOutReference().getName().equals(l.getAtom().getName())){
+							addReference = false;
+						}
+					}
+					
+					if(addReference){
+						positiveClauses.add(generateRelationString(reference, "="));
+					}
 			
+				}
+				
+				if(positiveClauses.size() > 0){
+					whereQuery = StringUtils.collectionToDelimitedString(positiveClauses, " AND ") + " AND " + "(" + whereQuery + ")";
+				}
+				
+				whereQuery = " WHERE " + whereQuery;
+				
+			}
+
+			query += whereQuery;
+
 		}
 
 		query +=";\n";
 
 		return query;
 
+	}
+	
+	private String generateRelationString(TableReference relation, String operator){
+		
+		String output = relation.getInReference().getPrefix() + "." 
+				+ relation.getInColumn() + "  " + operator + " "
+				+ relation.getOutReference().getPrefix() + "." + relation.getOutColumn();
+		
+		return output;
 	}
 
 
