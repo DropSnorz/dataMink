@@ -18,7 +18,6 @@ public class TableReference {
 		inReference.getOutputReferences().add(this);
 		outReference.getInputReferences().add(this);
 		
-		System.out.println("ADD REF: " + inReference.getName()+ "." + inColumn + "=>" + outReference.getName()+"."+outColumn);
 	}
 
 	public TableEntity getInReference() {

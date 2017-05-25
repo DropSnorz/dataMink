@@ -5,15 +5,17 @@ import java.util.ArrayList;
 import com.dropsnorz.datamink.utils.MappingStringUtils;
 
 import fr.univlyon1.mif37.dex.mapping.AbstractRelation;
+import fr.univlyon1.mif37.dex.mapping.Mapping;
 import fr.univlyon1.mif37.dex.mapping.Relation;
 import fr.univlyon1.mif37.dex.mapping.Tgd;
 
-public class StratifiedDatalogProgram {
+public class StratifiedDatalogProgram extends DatalogProgram{
 
 	ArrayList<ArrayList<Object>> partitions;
 
-	StratifiedDatalogProgram(){
+	StratifiedDatalogProgram(Mapping mapping){
 
+		super(mapping);
 		partitions = new ArrayList<ArrayList<Object>>();
 	}
 

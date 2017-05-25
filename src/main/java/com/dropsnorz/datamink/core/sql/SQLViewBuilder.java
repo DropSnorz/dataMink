@@ -74,10 +74,6 @@ public class SQLViewBuilder {
 			tables.put(l, table);
 		}
 
-		for(TableEntity table : tables.values()){
-			System.out.println(table);
-		}
-
 
 		if(tables.values().size() > 1){
 			for(TableEntity table : tables.values()){
@@ -252,19 +248,5 @@ public class SQLViewBuilder {
 		
 		return output;
 	}
-
-
-	private boolean isTablesColumnsFullyReferenced(){
-
-		for(TableEntity table : tables.values()){
-
-			if(!table.isFullyLinked()){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 
 }

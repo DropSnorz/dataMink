@@ -16,17 +16,17 @@ import fr.univlyon1.mif37.dex.mapping.Relation;
 import fr.univlyon1.mif37.dex.mapping.Tgd;
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
-public class EvaluationEngine {
+public class DatalogProgram {
 
-	Mapping mapping;
+	protected Mapping mapping;
 
-	public EvaluationEngine(Mapping mapping){
+	public DatalogProgram(Mapping mapping){
 
 		this.mapping = mapping;
 
 	}
 
-	public ProgramType computeProgramType(){
+	public ProgramType getProgramType(){
 
 
 		if(isPositive()) return ProgramType.POSITIVE;
@@ -125,7 +125,7 @@ public class EvaluationEngine {
 		}
 
 
-		StratifiedDatalogProgram sProgram = new StratifiedDatalogProgram();
+		StratifiedDatalogProgram sProgram = new StratifiedDatalogProgram(mapping);
 
 		for(Relation r : mapping.getEDB()){
 			sProgram.add(stratum.get(r.getName()), r);
@@ -198,6 +198,10 @@ public class EvaluationEngine {
 
 		return g;
 
+	}
+	
+	public Mapping getMapping(){
+		return mapping;
 	}
 
 

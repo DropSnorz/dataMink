@@ -62,7 +62,7 @@ public class SQLTranslator {
 			
 			SQLTableBuilder builder = new SQLBuilder().createTable(table);
 
-			for(int i = 0; i < nColumns; i++){
+			for(int i = 1; i < nColumns + 1; i++){
 				builder.appendColumns(Integer.toString(i), "VARCHAR(150)");
 			}
 

@@ -11,7 +11,8 @@ import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.shell.support.util.OsUtils;
 import org.springframework.stereotype.Component;
 
-import com.dropsnorz.datamink.core.EvaluationEngine;
+import com.dropsnorz.datamink.core.DatalogEngine;
+import com.dropsnorz.datamink.core.DatalogProgram;
 import com.dropsnorz.datamink.core.ProgramEvaluator;
 import com.dropsnorz.datamink.core.ProgramType;
 import com.dropsnorz.datamink.core.SQLTranslator;
@@ -80,10 +81,9 @@ public class ParserCommands implements CommandMarker {
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
-				EvaluationEngine engine = new EvaluationEngine(mapping);
-				ProgramType type = engine.computeProgramType();
+				DatalogEngine engine = new DatalogEngine(mapping);
 
-				return "Program is " + type;
+				return "Program is " + engine.getProgramType();
 
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
@@ -99,7 +99,7 @@ public class ParserCommands implements CommandMarker {
 	}
 
 
-	@CliCommand(value = "dm stratify", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
+	@CliCommand(value = "dm stratify", help = "Returns datalog program type (Positive, Semi-positive, Unknow)")
 	public String stratify(
 			@CliOption(key = { "" }, mandatory = false, help = "Datalog program file to stratify") final String defaultPath,
 			@CliOption(key = { "file" }, mandatory = false, help = "Datalog program file to stratify") final String path){
@@ -118,20 +118,9 @@ public class ParserCommands implements CommandMarker {
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
-				EvaluationEngine engine = new EvaluationEngine(mapping);
-				ProgramType type = engine.computeProgramType();
-
-
-				if(type == ProgramType.POSITIVE){
-					return "Program is Positive, no need to stratify it";
-				}
-				else if(type == ProgramType.SEMI_POSITIVE || type == ProgramType.STRATIFIABLE){
-					return engine.stratify().toString();
-				}
-				else{
-					return "Program is not Stratifiable";
-
-				}
+				DatalogEngine engine = new DatalogEngine(mapping);
+				
+				return engine.stratify();
 
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
@@ -166,23 +155,9 @@ public class ParserCommands implements CommandMarker {
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
-				EvaluationEngine engine = new EvaluationEngine(mapping);
+				DatalogEngine engine = new DatalogEngine(mapping);
 
-				ProgramType type = engine.computeProgramType();
-				ProgramEvaluator evaluator = new ProgramEvaluator(mapping);
-
-				if(type == ProgramType.POSITIVE){
-					evaluator.evaluation();
-				}
-				else if (type == ProgramType.SEMI_POSITIVE || type == ProgramType.STRATIFIABLE){
-					StratifiedDatalogProgram stratification = engine.stratify();
-					evaluator.stratifiedEvaluation(stratification);
-				}
-				else{
-					return "Error: could not compute program type";
-				}
-
-				return evaluator.getComputedFactsDisplay();
+				return engine.eval();
 
 
 			} catch (ParseException e) {
@@ -218,25 +193,9 @@ public class ParserCommands implements CommandMarker {
 			MappingParser mp = new MappingParser(fis);
 			try {
 				Mapping mapping = mp.mapping();
-				EvaluationEngine engine = new EvaluationEngine(mapping);
+				DatalogEngine engine = new DatalogEngine(mapping);
 
-				ProgramType type = engine.computeProgramType();
-				ProgramEvaluator evaluator = new ProgramEvaluator(mapping);
-
-				if(type == ProgramType.POSITIVE){
-					evaluator.evaluation();
-				}
-				else if (type == ProgramType.SEMI_POSITIVE || type == ProgramType.STRATIFIABLE){
-					StratifiedDatalogProgram stratification = engine.stratify();
-					evaluator.stratifiedEvaluation(stratification);
-				}
-				else{
-					return "Error: could not compute program type";
-				}
-				
-				SQLTranslator translator = new SQLTranslator(mapping);
-
-				return translator.toSql();
+				return engine.toSql();
 
 
 			} catch (ParseException e) {

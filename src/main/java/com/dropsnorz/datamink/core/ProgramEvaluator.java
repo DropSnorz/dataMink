@@ -25,6 +25,9 @@ public class ProgramEvaluator {
 	public ProgramEvaluator(Mapping mapping){
 		this.mapping = mapping;
 	}
+	public ProgramEvaluator(DatalogProgram datalogProgram){
+		this.mapping = datalogProgram.getMapping();
+	}
 
 	/**
 	 * Infers and computes all the facts in a positive datalog program
