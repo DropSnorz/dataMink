@@ -7,6 +7,8 @@ Based on mif37-dex (University Lyon 1) and using [Spring-shell](https://projects
 
 
 ## Run
+All binaries are available [here](https://github.com/DropSnorz/dataMink/releases).
+
 
 ### Default engine
 
@@ -19,10 +21,10 @@ This will compute program type, stratification if needed, evaluation and sql tra
 
 ### DataMink shell
 
-DataMink provide a powerfull CLI runining on all good shells. To start the shell simply run datamink without any parameters.
+DataMink provide a powerfull CLI running on all good shells. To start the shell simply run datamink without any parameters.
 
 ```
-java -jar datamink.jar yourFile
+java -jar datamink.jar
 ```
 
 Once the shell is started, you have access to several commands.
