@@ -30,7 +30,7 @@ public class ParserCommands implements CommandMarker {
 	@Autowired
 	FileService fileService;
 
-	@CliCommand(value = "dm parse", help = "Parse the given datalog program and show results")
+	@CliCommand(value = "dm parse", help = "Compute program type for the given or pre-loaded datalog file and prints the result")
 	public String parse(
 			@CliOption(key = { "" }, mandatory = false, help = "Datalog file to parse") final String defaultPath,
 			@CliOption(key = { "file" }, mandatory = false, help = "Datalog file to parse") final String path){
@@ -99,7 +99,7 @@ public class ParserCommands implements CommandMarker {
 	}
 
 
-	@CliCommand(value = "dm stratify", help = "Returns datalog program type (Positive, Semi-positive, Unknow)")
+	@CliCommand(value = "dm stratify", help = "Stratify the given or pre-loaded datalog file and prints all stratums")
 	public String stratify(
 			@CliOption(key = { "" }, mandatory = false, help = "Datalog program file to stratify") final String defaultPath,
 			@CliOption(key = { "file" }, mandatory = false, help = "Datalog program file to stratify") final String path){
@@ -137,7 +137,7 @@ public class ParserCommands implements CommandMarker {
 
 
 
-	@CliCommand(value = "dm eval", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
+	@CliCommand(value = "dm eval", help = "Compute evaluation for the given or pre-loaded datalog file and prints inferred facts")
 	public String eval(
 			@CliOption(key = { "" }, mandatory = false, help = "Datalog program file to evaluate") final String defaultPath,
 			@CliOption(key = { "file" }, mandatory = false, help = "Datalog program file to evaluate") final String path){
@@ -175,7 +175,7 @@ public class ParserCommands implements CommandMarker {
 	
 	
 	
-	@CliCommand(value = "dm toSql", help = "Returns datalog program type (Positive, Semo-positive, Unknow)")
+	@CliCommand(value = "dm tosql", help = "Translate the given or pre-loaded datalog file to SQL and prints the result")
 	public String toSql(
 			@CliOption(key = { "" }, mandatory = false, help = "Datalog program file to evaluate") final String defaultPath,
 			@CliOption(key = { "file" }, mandatory = false, help = "Datalog program file to evaluate") final String path){
