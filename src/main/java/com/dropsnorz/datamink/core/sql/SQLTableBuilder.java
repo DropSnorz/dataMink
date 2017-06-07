@@ -25,7 +25,7 @@ public class SQLTableBuilder {
 		String[] columnsArray = new String[columns.size()];
 		columns.toArray(columnsArray);
 		
-		return "CREATE TABLE "+ tableName + "( " + StringUtils.arrayToCommaDelimitedString(columnsArray) + " )";
+		return "CREATE TABLE "+ tableName + " ( " + StringUtils.arrayToCommaDelimitedString(columnsArray) + " );";
 
 	}
 	

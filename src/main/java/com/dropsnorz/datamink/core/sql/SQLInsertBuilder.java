@@ -17,7 +17,13 @@ public class SQLInsertBuilder {
 	}
 	
 	public SQLInsertBuilder values(String[] valuesArray){
-		this.valuesArray = valuesArray;
+		this.valuesArray = valuesArray.clone();
+		
+		for(int i = 0; i < this.valuesArray.length; i ++){
+			this.valuesArray[i] = "'" + valuesArray[i] + "'";
+		}
+		
+		
 		
 		return this;
 	}

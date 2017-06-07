@@ -67,7 +67,7 @@ public class SQLViewBuilder {
 
 			ArrayList<String> columns = new ArrayList<String>();
 			for(int k = 0; k < variables.size(); k ++){
-				columns.add(Integer.toString(k + 1));
+				columns.add("c"+Integer.toString(k + 1));
 			}
 			table.setColumns(columns);
 
